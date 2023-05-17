@@ -51,4 +51,9 @@ void free_conf( Config * );    // free memory
 */
 void ProcessSourceData( FILE *, char *, Config *, AdjGraph * );
 
+/*
+* implementation of adjustment of gnss network
+*/
+void ImplNetworkAdjustment( Config *, AdjGraph * );
+
 #endif

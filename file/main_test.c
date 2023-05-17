@@ -1,7 +1,70 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
+int main()
+{
+    FILE * fp = NULL;
+    fp = fopen( "adjust_data_sort.txt", "rb" );
+
+    int node[ 14 ][ 2 ];
+    double data[ 14 ][ 9 ];
+
+    for( int index = 0; index < 14; index++ )
+    {
+	for( int index_i = 0; index_i < 2; index_i++ )
+	{
+	    fscanf( fp, "%d", &node[ index ][ index_i ] );
+	}
+	for( int index_i = 0; index_i < 9; index_i++)
+	{
+	    fscanf( fp, "%lg", &data[ index ][ index_i ] );
+	}
+    }
+
+    fclose( fp );
+
+    for( int index = 0; index < 14; index++ )
+    {
+	for( int index_i = 3; index_i < 9; index_i++ )
+	{
+	    if( data[ index ][ index_i ] > 0 )
+	    {
+		data[ index ][ index_i ] = sqrt( data[ index ][ index_i ] );
+	    }
+	    else
+	    {
+		data[ index ][ index_i ] = -sqrt( -data[ index ][ index_i ] );
+	    }
+	}
+    }
+
+    fp = fopen( "adjust_data_std.txt", "wb" );
+
+    for( int index = 0; index < 14; index++ )
+    {
+	for( int index_i = 0; index_i < 2; index_i++ )
+	{
+	    fprintf( fp, "%d\t", node[ index ][ index_i ] );
+	}
+	for( int index_i = 0; index_i < 3; index_i++ )
+	{
+	    fprintf( fp, "%.4lf\t", data[ index ][ index_i ] );
+	}
+	for( int index_i = 3; index_i < 9; index_i++ )
+	{
+	    fprintf( fp, "%.4le\t", data[ index ][ index_i ] );
+	}
+	fprintf( fp, "\n" );
+    }
+
+    fclose( fp );
+
+    return 0;
+}
+
+#if 0
 int main()
 {
     FILE *fp = NULL;
@@ -89,6 +152,7 @@ int main()
 
     return 0;
 }
+#endif
 
 #if 0
 int main()

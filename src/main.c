@@ -12,10 +12,12 @@ int main(int argc, char **argv)
     FILE *fp_adjust = NULL;
 
     // processing configure file
-    // ProcessConfigureFile(fp_adjust, file_configure, adjust_conf);
-    ProcessConfigureFile_sort( fp_adjust, file_configure, adjust_conf );
+    ProcessConfigureFile(fp_adjust, file_configure, adjust_conf);
+    // ProcessConfigureFile_sort( fp_adjust, file_configure, adjust_conf );
 
-#if 1
+    puts("============ GNSS network generation ============");
+
+#if 0
     printf("adjust_conf->cnt_Station = %d\n", adjust_conf->cnt_Station);
     printf("adjust_conf->cnt_BaseStation = %d\n", adjust_conf->cnt_BaseStation);
     printf("adjust_conf->cnt_RoverStation = %d\n", adjust_conf->cnt_RoverStation);
@@ -43,6 +45,10 @@ int main(int argc, char **argv)
     AdjGraph *value_graph = GraphGeneration(adjust_conf->cnt_Station); // graph generation with count vertices
     // AdjGraph * value_graph = GraphGeneration( 6 );    // graph generation with count vertices
     ProcessSourceData(fp_adjust, file_data, adjust_conf, value_graph);
+
+    // gnss network adjustment implmentation
+    puts( "\n============ Implementation of GNSS network adjustment ============" );
+    ImplNetworkAdjustment( adjust_conf, value_graph );
 
     // free memory
     free_conf(adjust_conf);
