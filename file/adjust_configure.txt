@@ -1,0 +1,17 @@
+6    # cnt_Station
+2    # cnt_BaseStation
+4    # cnt_RoverStation
+0    # id_BaseStation
+1    # id_BaseStation
+2    # id_RoverStation
+3    # id_RoverStation
+4    # id_RoverStation
+5    # id_RoverStation
+402.35087    # coo_BaseStation
+-4652995.30109    # coo_BaseStation
+4349760.77753    # coo_BaseStation
+8086.03178    # coo_BaseStation
+-4642712.84739    # coo_BaseStation
+4360439.08326    # coo_BaseStation
+14    # cnt_BaseLine
+0    # mtd_Weight
