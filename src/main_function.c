@@ -10,13 +10,15 @@ void ProcessSourceData(FILE *fp_data, char *file_data, Config *var_conf, AdjGrap
 
 	int node_location[2] = {0};	 // node enumeration
 	double weight_data[9] = {0}; // weight data in edge
-	// for (int index = 0; index < var_conf->cnt_BaseLine; index++)
-	for (int index = 0; index < 14; index++)
+	for (int index = 0; index < var_conf->cnt_BaseLine; index++)
 	{
 		for (int index_i = 0; index_i < 2; index_i++)
 		{
 			fscanf(fp_data, "%d", node_location + index_i);
 		}
+
+		EncodeStationId( var_conf, 2, node_location );
+
 		for (int index_i = 0; index_i < 9; index_i++)
 		{
 			fscanf(fp_data, "%lg", weight_data + index_i);
@@ -31,6 +33,27 @@ void ProcessSourceData(FILE *fp_data, char *file_data, Config *var_conf, AdjGrap
 	puts(">>>>>>>>>>>>graph display:");
 	GraphDisplay(var_data);
 #endif
+}
+
+void EncodeStationId( Config * var_conf, int len_node, int * node )
+{
+	for( int index = 0; index < len_node; index++ )
+	{
+		for( int index_i = 0; index_i < var_conf->cnt_BaseStation; index_i++ )
+		{
+			if( *( node + index ) == var_conf->id_BaseStation[ index_i ] )
+			{
+				*( node + index ) = index_i;
+			}
+		}
+		for( int index_i = 0; index_i < var_conf->cnt_RoverStation; index_i++ )
+		{
+			if( *( node + index ) == var_conf->id_RoverStation[ index_i ] )
+			{
+				*( node + index ) = index_i + var_conf->cnt_BaseStation;
+			}
+		}
+	}
 }
 
 void free_conf(Config *adjust_conf)

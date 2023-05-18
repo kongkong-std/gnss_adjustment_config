@@ -7,7 +7,7 @@ int main(int argc, char **argv)
 
     Config *adjust_conf = NULL;
     adjust_conf = (Config *)malloc(sizeof(Config));
-    memset(adjust_conf, 0, sizeof(Config));
+    // memset(adjust_conf, 0, sizeof(Config));
 
     FILE *fp_adjust = NULL;
 
@@ -47,8 +47,25 @@ int main(int argc, char **argv)
     ProcessSourceData(fp_adjust, file_data, adjust_conf, value_graph);
 
     // gnss network adjustment implmentation
-    puts( "\n============ Implementation of GNSS network adjustment ============" );
-    ImplNetworkAdjustment( adjust_conf, value_graph );
+    puts("\n============ Implementation of GNSS network adjustment ============");
+    Solution *value_sol = NULL;
+    value_sol = (Solution *)malloc(sizeof(Solution));
+    ImplNetworkAdjustment(adjust_conf, value_graph, value_sol);
+
+#if 1 // display solution
+    puts(">>>>>>>>>>>> Solution of GNSS network adjustment:");
+    printf("result L2 norm of LSE: %.8lf\n", value_sol->norm_result);
+    printf("id_rover\tpos_x\tpos_y\tpos_z\n");
+    for (int index_i = 0; index_i < adjust_conf->cnt_RoverStation; index_i++)
+    {
+        printf("%d\t", value_sol->id_RoverStation[index_i]);
+        for (int index_j = 0; index_j < 3; index_j++)
+        {
+            printf("%.4lf\t", value_sol->coo_RoverStation[3 * index_i + index_j]);
+        }
+        putchar('\n');
+    }
+#endif
 
     // free memory
     free_conf(adjust_conf);
