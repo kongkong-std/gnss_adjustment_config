@@ -2,8 +2,10 @@
 
 int main(int argc, char **argv)
 {
+#if 1
     char *file_configure = argv[1]; // configure file
     char *file_data = argv[2];      // data file
+#endif
 
     Config *adjust_conf = NULL;
     adjust_conf = (Config *)malloc(sizeof(Config));
