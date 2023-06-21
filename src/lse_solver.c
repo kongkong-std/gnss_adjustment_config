@@ -1,5 +1,28 @@
+/**
+ * @file lse_solver.c
+ * @author Zikang Qin
+ * @brief linear algebra solver, linear system assembling,
+ * perform QR decompostioin with givens rotation,
+ * solving upper triangular linear system with Gaussian elimination
+ * 
+ * @version 0.1
+ * @date 2023-06-21
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
 #include "../include/lse_solver.h"
 
+/**
+ * @callgraph
+ * @brief updating linear system with full weight
+ * 
+ * @param [in] mat_Cov variance-covariance matrix
+ * @param [in] row_start row index of block matrix
+ * @param [in] column_start column index of block matrix
+ * @param [in,out] lse_A linear system coefficient matrix
+ * @param [in,out] lse_b linear system right-hand side vector
+ */
 void update_linsys_full_weight(double **mat_Cov, int row_start, int column_start,
                                double **lse_A, double *lse_b)
 {
@@ -70,6 +93,15 @@ void update_linsys_full_weight(double **mat_Cov, int row_start, int column_start
     free(tmp_vector);
 }
 
+/**
+ * @callgraph
+ * @brief assembling variance-covariance matrix with
+ * baseline source data
+ * 
+ * @param [in] data_Baseline baseline source data
+ * @param [in] row_start row index of block variance-covariance matrix
+ * @param [in,out] mat_Cov variance-covariance matrix
+ */
 void assemble_mat_Cov(double **data_Baseline, int row_start, double **mat_Cov)
 {
     // diagonal element data_BaseLine[][3, 4, 5] sigma_xx, sigma_yy, sigma_zz
@@ -106,6 +138,16 @@ void assemble_mat_Cov(double **data_Baseline, int row_start, double **mat_Cov)
     }
 }
 
+/**
+ * @callgraph
+ * @brief solving upper triangular linear system with
+ * gaussian elimination
+ * 
+ * @param [in] mat coefficient matrix of linear system 
+ * @param [in] rhs right-hand side vector of linear system 
+ * @param [in] column dimension of linear system 
+ * @param [in,out] sol solution to linear system 
+ */
 void LSEGauss(double **mat, double *rhs, int column, double *sol)
 {
     // solving upper triangular linear system with direct method
@@ -123,6 +165,20 @@ void LSEGauss(double **mat, double *rhs, int column, double *sol)
     }
 }
 
+/**
+ * @callgraph
+ * @brief givens rotation, which can make selective
+ * non-zero element become zero element
+ * 
+ * @param [in] val_a selective element of matrix
+ * @param [in] val_b selective element of matrix
+ * @param [in] index_i row index of val_a
+ * @param [in] index_j row index of val_b
+ * @param [in] row row size of matrix
+ * @param [in] column column size of matrix
+ * @param [in,out] mat matrix and transformed matrix
+ * @param [in,out] rhs right-hand side vector and transformed right-hand side vector
+ */
 void givens_rotation_impl(double val_a, double val_b, int index_i, int index_j,
                           int row, int column, double **mat, double *rhs)
 {
@@ -183,6 +239,17 @@ void givens_rotation_impl(double val_a, double val_b, int index_i, int index_j,
     rhs[index_j] = givens_s * temp_1 + givens_c * temp_2;
 }
 
+/**
+ * @callgraph
+ * @brief solving least-squares equation with QR
+ * decomposition, performing QR decomposition
+ * with givens rotation
+ * 
+ * @param [in,out] mat coefficient matrix of least-squares equation
+ * @param [in,out] rhs right-hand side vector of least-squares equation
+ * @param [in] row row size of least-squares equation
+ * @param [out] column column size of least-squares equation
+ */
 void LSEGivens(double **mat, double *rhs, int row, int column)
 {
     for (int index = 0; index < column; index++)
@@ -195,6 +262,16 @@ void LSEGivens(double **mat, double *rhs, int row, int column)
     }
 }
 
+/**
+ * @callgraph
+ * @brief check if variant code is base station code,
+ * if true, function returns 1; else, function returns 0
+ * 
+ * @param [in] code judged code of station
+ * @param [in] code_BaseStation array of base station
+ * @param [in] cnt_BaseStation size of array of base station
+ * @return int(1) is base station, int(0) is not base station
+ */
 int IsBaseStation(int code, int *code_BaseStation, int cnt_BaseStation)
 {
     int value = 0;
@@ -211,6 +288,25 @@ int IsBaseStation(int code, int *code_BaseStation, int cnt_BaseStation)
     return value;
 }
 
+/**
+ * @callgraph
+ * @brief assemble corresponding least-squares equation
+ * with full weight
+ * 
+ * @param [in] vertex_enum vertex enumeration of graph
+ * @param [in] data_BaseLine baseline source data
+ * @param [in] data_row row size of baseline data
+ * @param [in] data_column column size of baseline data
+ * @param [in] vertex_column column size of edge vertex, equals to 2
+ * @param [in] code_BaseStation base station code
+ * @param [in] coo_BaseStation coordinate of base station
+ * @param [in] cnt_BaseStation count of base station
+ * @param [in] coo_column column size of coordinate
+ * @param [in,out] lse_A least-squares equation coefficient matrix
+ * @param [in,out] lse_b least-squares right-hand side vector
+ * @param [in] lse_size_row row size of least-squares equation
+ * @param [in] lse_size_column column size of least-squares equation
+ */
 void LSEAssemble_2(int **vertex_enum, double **data_BaseLine, int data_row, int data_column, int vertex_column,
                    int *code_BaseStation, double **coo_BaseStation, int cnt_BaseStation, int coo_column,
                    double **lse_A, double *lse_b, int lse_size_row, int lse_size_column)
@@ -330,6 +426,25 @@ void LSEAssemble_2(int **vertex_enum, double **data_BaseLine, int data_row, int 
     free(mat_Cov);
 }
 
+/**
+ * @callgraph
+ * @brief assemble corresponding least-squares equation
+ * with diagonal weight
+ * 
+ * @param [in] vertex_enum vertex enumeration of graph
+ * @param [in] data_BaseLine baseline source data
+ * @param [in] data_row row size of baseline data
+ * @param [in] data_column column size of baseline data
+ * @param [in] vertex_column column size of edge vertex, equals to 2
+ * @param [in] code_BaseStation base station code
+ * @param [in] coo_BaseStation coordinate of base station
+ * @param [in] cnt_BaseStation count of base station
+ * @param [in] coo_column column size of coordinate
+ * @param [in,out] lse_A least-squares equation coefficient matrix
+ * @param [in,out] lse_b least-squares right-hand side vector
+ * @param [in] lse_size_row row size of least-squares equation
+ * @param [in] lse_size_column column size of least-squares equation
+ */
 void LSEAssemble_1(int **vertex_enum, double **data_BaseLine, int data_row, int data_column, int vertex_column,
                    int *code_BaseStation, double **coo_BaseStation, int cnt_BaseStation, int coo_column,
                    double **lse_A, double *lse_b, int lse_size_row, int lse_size_column)
@@ -416,6 +531,25 @@ void LSEAssemble_1(int **vertex_enum, double **data_BaseLine, int data_row, int 
     }
 }
 
+/**
+ * @callgraph
+ * @brief assemble corresponding least-squares equation
+ * with equal weight
+ * 
+ * @param [in] vertex_enum vertex enumeration of graph
+ * @param [in] data_BaseLine baseline source data
+ * @param [in] data_row row size of baseline data
+ * @param [in] data_column column size of baseline data
+ * @param [in] vertex_column column size of edge vertex, equals to 2
+ * @param [in] code_BaseStation base station code
+ * @param [in] coo_BaseStation coordinate of base station
+ * @param [in] cnt_BaseStation count of base station
+ * @param [in] coo_column column size of coordinate
+ * @param [in,out] lse_A least-squares equation coefficient matrix
+ * @param [in,out] lse_b least-squares right-hand side vector
+ * @param [in] lse_size_row row size of least-squares equation
+ * @param [in] lse_size_column column size of least-squares equation
+ */
 void LSEAssemble_0(int **vertex_enum, double **data_BaseLine, int data_row, int data_column, int vertex_column,
                    int *code_BaseStation, double **coo_BaseStation, int cnt_BaseStation, int coo_column,
                    double **lse_A, double *lse_b, int lse_size_row, int lse_size_column)
@@ -486,6 +620,23 @@ void LSEAssemble_0(int **vertex_enum, double **data_BaseLine, int data_row, int 
     }
 }
 
+/**
+ * @callgraph
+ * @brief equal weight least-squares equation solver
+ * 
+ * @param [in] var_conf configure data for gnss adjustment of network
+ * @param [in] vertex_enum vertex enumeration
+ * @param [in] data_BaseLine baseline source data
+ * @param [in] data_row row size of baseline data
+ * @param [in] data_column column size of baseline data
+ * @param [in] vertex_column column size of edge vertex, equals to 2
+ * @param [in] lse_A coefficient matrix of least-squares equation
+ * @param [in] lse_b right-hand side vector
+ * @param [in] lse_size_row row size of least-squares equation
+ * @param [in] lse_size_column column size of least-squares equation
+ * @param [in,out] lse_sol solution to least-squares equation
+ * @param [in,out] lse_residual residual of least-squares equation
+ */
 void LSESolver_0(Config *var_conf, int **vertex_enum, double **data_BaseLine, int data_row, int data_column, int vertex_column,
                  double **lse_A, double *lse_b, int lse_size_row, int lse_size_column, double *lse_sol, double *lse_residual)
 {
@@ -575,6 +726,23 @@ void LSESolver_0(Config *var_conf, int **vertex_enum, double **data_BaseLine, in
     free(code_BaseStation);
 }
 
+/**
+ * @callgraph
+ * @brief diagonal weight least-squares equation solver
+ * 
+ * @param [in] var_conf configure data for gnss adjustment of network
+ * @param [in] vertex_enum vertex enumeration
+ * @param [in] data_BaseLine baseline source data
+ * @param [in] data_row row size of baseline data
+ * @param [in] data_column column size of baseline data
+ * @param [in] vertex_column column size of edge vertex, equals to 2
+ * @param [in] lse_A coefficient matrix of least-squares equation
+ * @param [in] lse_b right-hand side vector
+ * @param [in] lse_size_row row size of least-squares equation
+ * @param [in] lse_size_column column size of least-squares equation
+ * @param [in,out] lse_sol solution to least-squares equation
+ * @param [in,out] lse_residual residual of least-squares equation
+ */
 void LSESolver_1(Config *var_conf, int **vertex_enum, double **data_BaseLine, int data_row, int data_column, int vertex_column,
                  double **lse_A, double *lse_b, int lse_size_row, int lse_size_column, double *lse_sol, double *lse_residual)
 {
@@ -664,6 +832,23 @@ void LSESolver_1(Config *var_conf, int **vertex_enum, double **data_BaseLine, in
     free(code_BaseStation);
 }
 
+/**
+ * @callgraph
+ * @brief full weight least-squares equation solver
+ * 
+ * @param [in] var_conf configure data for gnss adjustment of network
+ * @param [in] vertex_enum vertex enumeration
+ * @param [in] data_BaseLine baseline source data
+ * @param [in] data_row row size of baseline data
+ * @param [in] data_column column size of baseline data
+ * @param [in] vertex_column column size of edge vertex, equals to 2
+ * @param [in] lse_A coefficient matrix of least-squares equation
+ * @param [in] lse_b right-hand side vector
+ * @param [in] lse_size_row row size of least-squares equation
+ * @param [in] lse_size_column column size of least-squares equation
+ * @param [in,out] lse_sol solution to least-squares equation
+ * @param [in,out] lse_residual residual of least-squares equation
+ */
 void LSESolver_2(Config *var_conf, int **vertex_enum, double **data_BaseLine, int data_row, int data_column, int vertex_column,
                  double **lse_A, double *lse_b, int lse_size_row, int lse_size_column, double *lse_sol, double *lse_residual)
 {

@@ -1,5 +1,32 @@
+/**
+ * @file adjustment_impl.c
+ * @author Zikang Qin
+ * @brief implementation of adjustment.
+ * firstly, assemble corresponding linear system
+ * based on different conditions;
+ * then, solve corresponding equation; finally,
+ * obtain the solution.
+ *
+ * @version 0.1
+ * @date 2023-06-21
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #include "../include/adjustment_impl.h"
 
+/**
+ * @callgraph
+ * @brief write solution to solution struct and computing norm
+ * of least-square equation
+ *
+ * @param [in] var_conf configure data of gnss adjustment of network
+ * @param [in] lse_sol solution of least-squares equation
+ * @param [in] lse_b right-hand side of linear system
+ * @param [in] lse_size_row row size of linear system
+ * @param [in] lse_size_column column size of linear system
+ * @param [in,out] var_solution solution struct
+ */
 void LSEUpdateSolution(Config *var_conf, double *lse_sol, double *lse_b,
                        int lse_size_row, int lse_size_column, Solution *var_solution)
 {
@@ -11,9 +38,17 @@ void LSEUpdateSolution(Config *var_conf, double *lse_sol, double *lse_b,
     {
         var_solution->coo_RoverStation[index] = lse_sol[index];
     }
-    var_solution->norm_result = lse_norm_2( lse_b + lse_size_column, lse_size_row - lse_size_column );
+    var_solution->norm_result = lse_norm_2(lse_b + lse_size_column, lse_size_row - lse_size_column);
 }
 
+/**
+ * @callgraph
+ * @brief computing L2 norm of vector a
+ *
+ * @param [in] a vector
+ * @param [in] dimension dimension of vector
+ * @return double norm of vector a
+ */
 double lse_norm_2(double *a, int dimension)
 {
     double value = 0;
@@ -26,6 +61,16 @@ double lse_norm_2(double *a, int dimension)
     return sqrt(value);
 }
 
+/**
+ * @callgraph
+ * @brief solve corresponding least-squares equation with configure conditions,
+ * mainly divides into three categories, equal weight, diagonal weight and full
+ * weight. ATTENTION: FULL WEIGHT CANNOT WORK CURRENTLY!
+ *
+ * @param [in] var_conf configure data of gnss adjustment of network
+ * @param [in] var_data graph data
+ * @param [in,out] var_solution solution of least-squares equation
+ */
 void ImplNetworkAdjustment(Config *var_conf, AdjGraph *var_data, Solution *var_solution)
 {
     if (var_conf->mtd_Weight == 0)
@@ -48,6 +93,14 @@ void ImplNetworkAdjustment(Config *var_conf, AdjGraph *var_data, Solution *var_s
     }
 }
 
+/**
+ * @callgraph
+ * @brief gnss adjustment of network with equal weight
+ *
+ * @param [in] var_conf configure data for gnss adjustment of network
+ * @param [in] var_data graph data for gnss adjustment of network
+ * @param [in,out] var_solution solution of gnss adjustment of network
+ */
 void ImplNetworkAdjustment_0(Config *var_conf, AdjGraph *var_data, Solution *var_solution)
 {
     // data size
@@ -171,6 +224,14 @@ void ImplNetworkAdjustment_0(Config *var_conf, AdjGraph *var_data, Solution *var
     free(vertex_enum);
 }
 
+/**
+ * @callgraph
+ * @brief gnss adjustment of network with diagonal weight
+ *
+ * @param [in] var_conf configure data for gnss adjustment of network
+ * @param [in] var_data graph data for gnss adjustment of network
+ * @param [in,out] var_solution solution of gnss adjustment of network
+ */
 void ImplNetworkAdjustment_1(Config *var_conf, AdjGraph *var_data, Solution *var_solution)
 {
     // data size
@@ -294,6 +355,15 @@ void ImplNetworkAdjustment_1(Config *var_conf, AdjGraph *var_data, Solution *var
     free(vertex_enum);
 }
 
+/**
+ * @callgraph
+ * @brief gnss adjustment of network with full weight,
+ * ATTENTION: CANNOT WORK CURRENTLY!
+ *
+ * @param [in] var_conf configure data for gnss adjustment of network
+ * @param [in] var_data graph data for gnss adjustment of network
+ * @param [in,out] var_solution solution of gnss adjustment of network
+ */
 void ImplNetworkAdjustment_2(Config *var_conf, AdjGraph *var_data, Solution *var_solution)
 {
     // data size
@@ -417,6 +487,19 @@ void ImplNetworkAdjustment_2(Config *var_conf, AdjGraph *var_data, Solution *var
     free(vertex_enum);
 }
 
+/**
+ * @callgraph
+ * @brief initialize least-squares equation,
+ * initialize coefficient matrix and right-hand
+ * side vector to 0
+ *
+ * @param [in,out] sol solution vector
+ * @param [in,out] rhs right-hand side vector
+ * @param [in,out] residual residual vector
+ * @param [in,out] mat coefficient matrix
+ * @param [in] row row size of coefficient matrix
+ * @param [in] column column size of coefficient matrix
+ */
 void InitLSE(double *sol, double *rhs, double *residual, double **mat, int row, int column)
 {
     // size

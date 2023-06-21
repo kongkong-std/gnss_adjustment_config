@@ -1,10 +1,28 @@
+/**
+ * @file graph_impl.c
+ * @author Zikang Qin
+ * @brief graph data structure with adjacency list
+ * @version 0.1
+ * @date 2023-06-21
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #include "../include/graph_impl.h"
 
 void InitializeLinkedList(AdjList *);
 
-/*
- * add node to adjacency list
- * */
+/**
+ * @callgraph
+ * @brief information of added edge,
+ * destinated node of edge and weight data
+ * of edge, assigning values to the struct
+ *
+ * @param [in] dest destinated node of edge
+ * @param [in] weight weight of edge
+ * @param [in] weight_size size of weight data in edge
+ * @return AdjListNode* added edge
+ */
 AdjListNode *AdjListAddNode(int dest, double *weight, int weight_size)
 {
     AdjListNode *new_node = NULL;
@@ -24,9 +42,14 @@ AdjListNode *AdjListAddNode(int dest, double *weight, int weight_size)
     return new_node;
 }
 
-/*
- * graph generation with n vertices
- * */
+/**
+ * @callgraph
+ * @brief graph generation with n vertices
+ * and n linked lists
+ *
+ * @param [in] n vertices of a graph
+ * @return AdjGraph* graph data structure
+ */
 AdjGraph *GraphGeneration(int n)
 {
     AdjGraph *graph = NULL;
@@ -59,19 +82,34 @@ AdjGraph *GraphGeneration(int n)
     return graph;
 }
 
-/*
- * initialize linkedlist in graph
- * ->head = NULL
+/**
+ * @callgraph
+ * @brief initialize linked list,
+ * the head pointer of linked list to NULL
+ * 
+ * @param [in,out] pList linked list
  */
 void InitializeLinkedList(AdjList *pList)
 {
     pList->head = NULL;
 }
 
-/*
- * add edge to graph
- *     location[0] -> location[1]
- * */
+/**
+ * @callgraph
+ * @brief add edge to graph, the numbering of 
+ * the two vertices of an edge and weight data 
+ * of the edge. source node is the first element of
+ * location array, destinated node is the second
+ * element of the edge. check if the head pointer
+ * of the lined list is NULL, if NULL, add edge to
+ * new adjacency list, else, add edge to tail of
+ * current adjacency list
+ * 
+ * @param [in,out] graph graph data structure
+ * @param [in] location source vertex and destinated vertes
+ * @param [in] weight weight data of edge
+ * @param [in] weight_size size of weight data
+ */
 void GraphInsert(AdjGraph *graph, int *location, double *weight, int weight_size)
 {
     /*
@@ -104,9 +142,13 @@ void GraphInsert(AdjGraph *graph, int *location, double *weight, int weight_size
     }
 }
 
-/*
- * graph display
- * */
+/**
+ * @callgraph
+ * @brief display the graph with adjacency list,
+ * graph traversal by vertex
+ * 
+ * @param [in] graph graph structure
+ */
 void GraphDisplay(AdjGraph *graph)
 {
     printf("count of vertices(vertex): %d\n", graph->count_vertex);
@@ -126,9 +168,12 @@ void GraphDisplay(AdjGraph *graph)
     }
 }
 
-/*
- * destroy graph, free memory
- * */
+/**
+ * @callgraph
+ * @brief free memory of graph data structure
+ * 
+ * @param [in,out] graph grph data structure
+ */
 void GraphDestroy(AdjGraph *graph)
 {
     for (int index = 0; index < graph->count_vertex; index++)

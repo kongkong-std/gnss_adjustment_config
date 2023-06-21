@@ -1,5 +1,28 @@
+/**
+ * @file main_function.c
+ * @author Zikang Qin
+ * @brief function in main function,
+ * mainly involves configure file process and
+ * source data process
+ *
+ * @version 0.1
+ * @date 2023-06-21
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #include "../include/main.h"
 
+/**
+ * @callgraph
+ * @brief source data process, assigning values
+ * to graph data structure with source data file
+ *
+ * @param [in] fp_data FILE pointer
+ * @param [in] file_data path to source data file
+ * @param [in] var_conf configure data for gnss adjustment of network
+ * @param [in,out] var_data graph data structure
+ */
 void ProcessSourceData(FILE *fp_data, char *file_data, Config *var_conf, AdjGraph *var_data)
 {
 	if ((fp_data = fopen(file_data, "rb")) == NULL)
@@ -17,7 +40,7 @@ void ProcessSourceData(FILE *fp_data, char *file_data, Config *var_conf, AdjGrap
 			fscanf(fp_data, "%d", node_location + index_i);
 		}
 
-		EncodeStationId( var_conf, 2, node_location );
+		EncodeStationId(var_conf, 2, node_location);
 
 		for (int index_i = 0; index_i < 9; index_i++)
 		{
@@ -35,27 +58,42 @@ void ProcessSourceData(FILE *fp_data, char *file_data, Config *var_conf, AdjGrap
 #endif
 }
 
-void EncodeStationId( Config * var_conf, int len_node, int * node )
+/**
+ * @callgraph
+ * @brief encoding base station and rover station
+ * sequentially start from 0
+ *
+ * @param [in] var_conf configure data for gnss adjustment of network
+ * @param [in] len_node count of stations
+ * @param [in,out] node array of station code
+ */
+void EncodeStationId(Config *var_conf, int len_node, int *node)
 {
-	for( int index = 0; index < len_node; index++ )
+	for (int index = 0; index < len_node; index++)
 	{
-		for( int index_i = 0; index_i < var_conf->cnt_BaseStation; index_i++ )
+		for (int index_i = 0; index_i < var_conf->cnt_BaseStation; index_i++)
 		{
-			if( *( node + index ) == var_conf->id_BaseStation[ index_i ] )
+			if (*(node + index) == var_conf->id_BaseStation[index_i])
 			{
-				*( node + index ) = index_i;
+				*(node + index) = index_i;
 			}
 		}
-		for( int index_i = 0; index_i < var_conf->cnt_RoverStation; index_i++ )
+		for (int index_i = 0; index_i < var_conf->cnt_RoverStation; index_i++)
 		{
-			if( *( node + index ) == var_conf->id_RoverStation[ index_i ] )
+			if (*(node + index) == var_conf->id_RoverStation[index_i])
 			{
-				*( node + index ) = index_i + var_conf->cnt_BaseStation;
+				*(node + index) = index_i + var_conf->cnt_BaseStation;
 			}
 		}
 	}
 }
 
+/**
+ * @callgraph
+ * @brief free memory of configure struct
+ *
+ * @param [in,out] adjust_conf configure data for gnss adjustment of network
+ */
 void free_conf(Config *adjust_conf)
 {
 #if 0
@@ -75,6 +113,19 @@ void free_conf(Config *adjust_conf)
 	free(adjust_conf);
 }
 
+/**
+ * @callgraph
+ * @brief process sorted configure file,
+ * this type of file contains only data
+ * information, such as, count of stations,
+ * base station coordinate and etc.
+ * assigning values to configure struct with
+ * configure file
+ *
+ * @param [in] fp_conf FILE pointer
+ * @param [in] file_conf path of configure file
+ * @param [in,out] var_conf configure struct
+ */
 void ProcessConfigureFile_sort(FILE *fp_conf, char *file_conf, Config *var_conf)
 {
 	if ((fp_conf = fopen(file_conf, "rb")) == NULL)
@@ -106,6 +157,16 @@ void ProcessConfigureFile_sort(FILE *fp_conf, char *file_conf, Config *var_conf)
 	fclose(fp_conf);
 }
 
+/**
+ * @callgraph
+ * @brief process configure file,
+ * assigning values to configure struct
+ * with configure file
+ *
+ * @param [in] fp_conf FILE pointer
+ * @param [in] file_conf path of configure file
+ * @param [in,out] var_conf configure struct
+ */
 void ProcessConfigureFile(FILE *fp_conf, char *file_conf, Config *var_conf)
 {
 	if ((fp_conf = fopen(file_conf, "rb")) == NULL)

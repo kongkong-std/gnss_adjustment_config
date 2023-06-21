@@ -1,10 +1,29 @@
-#include "../include/main.h"
+/**
+ * @file main.c
+ * @author Zikang Qin
+ * @brief main function of adjustment of GNSS network
+ * @version 0.1
+ * @date 2023-06-21
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 
+#include "../include/main.h"
+// adjustimpl( file_path,   Solution * sol )
+/**
+ * @callgraph
+ * @brief command line parameters, contain path of configure file
+ * and path of source data file
+ *
+ * @param [in] argc command line parameter
+ * @param [in] argv path of file
+ */
 int main(int argc, char **argv)
 {
 #if 1
-    char *file_configure = argv[1]; // configure file
-    char *file_data = argv[2];      // data file
+    char *file_configure = argv[1]; //!< path of configure file
+    char *file_data = argv[2];      //!< path of data file
 #endif
 
     Config *adjust_conf = NULL;
